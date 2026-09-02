@@ -762,7 +762,7 @@ const orkaDivisionsData = [
     no: 5,
     division: "Fofitos – Cloud Kitchen",
     icon: <AttachMoney />,
-    progress: "100%",
+    progress: "0%",
     milestones: [
       { text: "Project Kick off & Scope Capture", percent: 0 },
       { text: "Site Survey & Existing Condition", percent: 0 },
