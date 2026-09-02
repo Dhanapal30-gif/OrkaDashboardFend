@@ -1,0 +1,943 @@
+* {
+  box-sizing: border-box;
+}
+
+.owner-dashboard {
+  width: 100%;
+  min-height: 100vh;
+  padding: 28px;
+  background: #f5f7fb;
+  color: #172033;
+  font-family: Inter, Arial, sans-serif;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.dashboard-header p {
+  margin: 7px 0 0;
+  color: #7a8497;
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.period-select {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #dce1e9;
+  border-radius: 8px;
+  background: white;
+  color: #30394b;
+  font-size: 13px;
+  outline: none;
+}
+
+.refresh-btn,
+.view-btn {
+  border: 0;
+  background: #1d4ed8;
+  color: white;
+  height: 40px;
+  padding: 0 17px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.refresh-btn:hover,
+.view-btn:hover {
+  opacity: 0.9;
+}
+
+
+/* =========================
+   SECTION
+========================= */
+
+.section {
+  margin-top: 25px;
+}
+
+.section-title,
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-title h2,
+.section-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.section-title span,
+.section-heading p {
+  display: block;
+  margin: 5px 0 0;
+  color: #8892a5;
+  font-size: 12px;
+}
+
+
+/* =========================
+   HEALTH
+========================= */
+
+.health-section {
+  background: white;
+  padding: 22px;
+  border: 1px solid #e5e9f0;
+  border-radius: 14px;
+}
+
+.health-score {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.score-circle {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #eaf7ef;
+  color: #159447;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.health-score strong {
+  display: block;
+  font-size: 13px;
+}
+
+.health-score span {
+  display: block;
+  font-size: 11px;
+  color: #8b94a5;
+}
+
+
+/* =========================
+   SUMMARY CARDS
+========================= */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.summary-card {
+  padding: 18px;
+  border: 1px solid #e8ebf1;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.summary-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: #eef3ff;
+  color: #2859d9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+}
+
+.change {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.change.positive {
+  color: #169447;
+}
+
+.change.negative {
+  color: #dc3545;
+}
+
+.summary-value {
+  margin-top: 19px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.summary-title {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #515b6c;
+}
+
+.summary-subtitle {
+  margin-top: 3px;
+  font-size: 11px;
+  color: #9aa2b1;
+}
+
+
+/* =========================
+   DASHBOARD CARD
+========================= */
+
+.dashboard-card {
+  background: white;
+  border: 1px solid #e4e8ef;
+  border-radius: 13px;
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.card-header span {
+  display: block;
+  margin-top: 4px;
+  color: #8b94a5;
+  font-size: 11px;
+}
+
+.text-btn {
+  border: 0;
+  background: transparent;
+  color: #2455d6;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* =========================
+   FINANCIAL
+========================= */
+
+.financial-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.chart-total {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.chart-total small {
+  display: block;
+  margin-top: 3px;
+  color: #9aa2b1;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.chart {
+  height: 270px;
+  display: flex;
+  margin-top: 25px;
+}
+
+.chart-y-axis {
+  width: 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 24px;
+}
+
+.chart-y-axis span {
+  color: #a0a8b7;
+  font-size: 10px;
+}
+
+.chart-area {
+  flex: 1;
+  position: relative;
+}
+
+.grid-lines {
+  position: absolute;
+  inset: 0 0 25px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.grid-lines span {
+  width: 100%;
+  border-top: 1px dashed #e6eaf0;
+}
+
+.bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.bar-wrapper {
+  height: 100%;
+  width: 45px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.bar {
+  width: 27px;
+  max-height: 248px;
+  background: #3265dc;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  z-index: 2;
+}
+
+.bar-value {
+  font-size: 10px;
+  color: #586274;
+  margin-bottom: 4px;
+}
+
+.bar-label {
+  position: absolute;
+  bottom: 0;
+  transform: translateY(18px);
+  font-size: 10px;
+  color: #8b94a5;
+}
+
+
+/* =========================
+   PROFIT
+========================= */
+
+.profit-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.profit-icon {
+  font-size: 20px;
+  color: #159447;
+}
+
+.profit-main {
+  margin-top: 30px;
+}
+
+.profit-main strong {
+  display: block;
+  font-size: 32px;
+}
+
+.profit-main span {
+  display: block;
+  margin-top: 5px;
+  color: #8a94a5;
+  font-size: 12px;
+}
+
+.profit-details {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profit-details div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profit-details span {
+  color: #7e8798;
+  font-size: 12px;
+}
+
+.profit-details strong {
+  font-size: 13px;
+}
+
+.profit-progress {
+  margin-top: 25px;
+  height: 8px;
+  border-radius: 10px;
+  background: #edf0f5;
+  overflow: hidden;
+}
+
+.profit-progress-fill {
+  height: 100%;
+  background: #159447;
+  border-radius: 10px;
+}
+
+.profit-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #8a94a5;
+}
+
+
+/* =========================
+   PIPELINE
+========================= */
+
+.pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.pipeline-card {
+  background: white;
+  border: 1px solid #e4e8ef;
+  border-radius: 12px;
+  padding: 19px;
+}
+
+.pipeline-card span {
+  color: #7f899a;
+  font-size: 12px;
+}
+
+.pipeline-card strong {
+  display: block;
+  margin-top: 9px;
+  font-size: 25px;
+}
+
+.pipeline-card small {
+  display: block;
+  margin-top: 5px;
+  color: #9aa2b1;
+  font-size: 11px;
+}
+
+
+/* =========================
+   TWO COLUMN
+========================= */
+
+.two-column {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+
+
+/* =========================
+   PROJECTS
+========================= */
+
+.project-list {
+  margin-top: 20px;
+}
+
+.project-item {
+  display: grid;
+  grid-template-columns: 1.2fr 1.5fr 70px;
+  gap: 15px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.project-item:last-child {
+  border-bottom: 0;
+}
+
+.project-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.project-icon,
+.department-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #f0f4ff;
+  color: #315dd1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.project-info strong,
+.department-name strong {
+  display: block;
+  font-size: 12px;
+}
+
+.project-info span,
+.department-name span {
+  display: block;
+  margin-top: 4px;
+  color: #929baa;
+  font-size: 10px;
+}
+
+.project-progress {
+  min-width: 100px;
+}
+
+.progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.progress-top > span:first-child {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.project-status {
+  padding: 3px 7px;
+  border-radius: 20px;
+  font-size: 9px !important;
+  font-weight: 600;
+}
+
+.project-status.on-track {
+  color: #168c45;
+  background: #eaf7ef;
+}
+
+.project-status.delayed {
+  color: #c87c00;
+  background: #fff5df;
+}
+
+.project-status.completed {
+  color: #285acb;
+  background: #edf3ff;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #edf0f5;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar div {
+  height: 100%;
+  background: #3162d8;
+  border-radius: 10px;
+}
+
+.project-value {
+  font-size: 12px;
+  text-align: right;
+}
+
+
+/* =========================
+   DEPARTMENTS
+========================= */
+
+.department-list {
+  margin-top: 17px;
+}
+
+.department-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.department-item:last-child {
+  border-bottom: 0;
+}
+
+.department-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.department-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.department-header > strong {
+  font-size: 12px;
+}
+
+.department-progress {
+  height: 6px;
+  background: #edf0f5;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.department-progress div {
+  height: 100%;
+  background: #3162d8;
+  border-radius: 10px;
+}
+
+.department-bottom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+  font-size: 10px;
+  color: #8d96a6;
+}
+
+.department-bottom strong {
+  color: #475165;
+}
+
+
+/* =========================
+   SMALL CARDS
+========================= */
+
+.four-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.small-dashboard-card {
+  background: white;
+  border: 1px solid #e4e8ef;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.small-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: #eff3ff;
+  color: #315ed2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.small-dashboard-card > span {
+  display: block;
+  color: #7f899a;
+  font-size: 11px;
+}
+
+.small-dashboard-card > strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 22px;
+}
+
+.small-card-change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  color: #159447;
+  font-size: 10px;
+}
+
+
+/* =========================
+   ALERTS
+========================= */
+
+.alerts-card {
+  padding-bottom: 10px;
+}
+
+.alert-count {
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #fff1f1;
+  color: #d34242 !important;
+  font-size: 10px !important;
+}
+
+.alerts-list {
+  margin-top: 17px;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px;
+  border-radius: 9px;
+  margin-bottom: 8px;
+}
+
+.alert-item.danger {
+  background: #fff5f5;
+}
+
+.alert-item.warning {
+  background: #fff9ed;
+}
+
+.alert-item.success {
+  background: #f0faf4;
+}
+
+.alert-item.info {
+  background: #f1f6ff;
+}
+
+.alert-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-content strong {
+  display: block;
+  font-size: 12px;
+}
+
+.alert-content span {
+  display: block;
+  margin-top: 3px;
+  color: #929baa;
+  font-size: 10px;
+}
+
+.alert-action {
+  border: 0;
+  background: transparent;
+  color: #285bd0;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* =========================
+   MANAGEMENT
+========================= */
+
+.management-section {
+  background: #172033;
+  color: white;
+  padding: 24px;
+  border-radius: 14px;
+}
+
+.management-section h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.management-section > div:first-child p {
+  color: #aeb7c7;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.actions-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.management-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+.management-action > div:nth-child(2) {
+  flex: 1;
+}
+
+.action-number {
+  color: #8fa7e8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.management-action strong {
+  display: block;
+  font-size: 12px;
+}
+
+.management-action span {
+  display: block;
+  margin-top: 5px;
+  color: #aeb7c7;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.management-action > svg {
+  color: #8fa7e8;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1200px) {
+
+  .summary-grid,
+  .four-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pipeline-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 900px) {
+
+  .financial-grid,
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .period-select {
+    flex: 1;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .owner-dashboard {
+    padding: 15px;
+  }
+
+  .summary-grid,
+  .pipeline-grid,
+  .four-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header h1 {
+    font-size: 22px;
+  }
+
+  .health-section {
+    padding: 15px;
+  }
+
+  .section-title {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .summary-value {
+    font-size: 21px;
+  }
+
+  .project-item {
+    grid-template-columns: 1fr;
+  }
+
+  .project-value {
+    text-align: left;
+  }
+
+  .financial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart {
+    overflow-x: auto;
+  }
+
+  .bars {
+    min-width: 500px;
+  }
+}
