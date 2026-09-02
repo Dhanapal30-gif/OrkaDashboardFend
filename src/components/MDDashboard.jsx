@@ -56,35 +56,36 @@ const revenueData = [
 //   { stage: "PO Confirmed", value: 60, count: 3 },
 // ];
 
+
 const pipelineData = [
   {
-    company: "Tata Electronics",
-    stage: "Lead",
-    value: 25,
-    count: 1,
-  },
-  {
-    company: "Ashok Leyland",
-    stage: "Enquiry",
-    value: 40,
-    count: 1,
-  },
-  {
-    company: "Nokia Solutions",
-    stage: "Solution",
-    value: 35,
-    count: 1,
-  },
-  {
-    company: "TVS Electronics",
+    company: "Tata Chennai 5th batch",
     stage: "Quotation",
-    value: 55,
-    count: 1,
+    value: 10,
+    count: 5,
   },
   {
-    company: "Siemens India",
+    company: "Flex DTA Alt chamber service",
+    stage: "Quotation",
+    value: 17,
+    count: 10,
+  },
+  {
+    company: "AQMS Nokia Chennai service",
+    stage: "Quotation",
+    value: 1.6,
+    count: 1,
+  },
+//   {
+//     company: "Tata Bengaluru: AQT Rack Modification",
+//     stage: "Quotation",
+//     value: 3.5,
+//     count: 1,
+//   },
+  {
+    company: "Vantiva Nirma - ALT Chamber cycle power cut of",
     stage: "PO Confirmed",
-    value: 60,
+    value: 2.5,
     count: 1,
   },
 ];
