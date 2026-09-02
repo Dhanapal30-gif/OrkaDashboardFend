@@ -518,13 +518,30 @@
 ===================================================== */
 
 .table-wrapper,
-.project-table-wrapper,
 .performance-table-wrapper {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
+
+/* project table: show 5 rows then enable vertical scroll */
+.project-table-wrapper {
+  width: 100%;
+  max-height: 380px; /* approximately 5 rows + header, adjust if needed */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* compact vertical table: constrain height and enable vertical scroll */
+.compact-table {
+  max-height: 220px; /* adjust as needed */
+  overflow-y: auto;
+}
+
+.compact-table::-webkit-scrollbar { width: 8px; }
+.compact-table::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 20px; }
 
 .table-wrapper::-webkit-scrollbar,
 .project-table-wrapper::-webkit-scrollbar,
@@ -652,17 +669,29 @@
 .project-avatar.warning { background: #fef3c7; color: #b45309; }
 .project-avatar.danger { background: #fee2e2; color: #dc2626; }
 
+/* make avatar clickable */
+.project-avatar {
+ cursor: pointer;
+ transition: transform .12s ease, box-shadow .12s ease;
+}
+.project-avatar:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(15,23,42,.06); }
+
 .upcoming { color: #f59e0b !important; }
 .profit-positive { color: #16a34a !important; }
 .profit-negative { color: #dc2626 !important; }
-
+ 
 .progress-cell { width: 100px; }
-
+ 
 .progress-cell > span {
   display: block;
   margin-bottom: 5px;
   font-size: var(--fs-xxs);
   font-weight: 700;
+}
+
+/* project detail button (deprecated) */
+.project-detail-btn {
+ display: none; /* removed in favor of avatar click */
 }
 
 .custom-progress {
@@ -1147,4 +1176,157 @@
   .management-header { flex-direction: column; align-items: flex-start; }
 
   .aging-row { grid-template-columns: 62px 1fr 56px; }
+}
+
+/* =====================================================
+   ORKA DIVISIONS / MODAL STYLES
+===================================================== */
+.division-table-wrapper { padding-top: 6px; }
+
+.division-table .division-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  color: #095bcf;
+}
+
+.division-table .division-icon svg { font-size: 18px; }
+
+.division-view-btn {
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #6366f1;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.division-view-btn:hover { background: #6366f1; color: white; }
+
+.division-summary { color: #6b7280; font-size: 12px; margin-top: 6px; }
+
+.division-progress-cell strong { display: block; font-size: 13px; color: #0f172a; }
+.division-progress-cell .mini-progress { max-width: 160px; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 22px;
+  max-width: 880px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: auto;
+  box-shadow: 0 20px 50px rgba(15,23,42,.4);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.detail-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.detail-table th {
+  text-align: left;
+  padding: 12px 14px;
+  width: 240px;
+  background: #fff7ed;
+  font-weight: 800;
+  color: #92400e;
+  vertical-align: top;
+}
+.detail-table td { padding: 12px 14px; background: #ffffff; color: #172033; }
+
+/* Milestone header row inside modal */
+.milestone-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 12px 6px;
+}
+
+.milestone-col {
+  min-width: 160px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #faf7f3;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.milestone-percent {
+  font-weight: 800;
+  color: #92400e;
+  background: rgba(146,64,14,0.08);
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.milestone-text {
+  font-size: 13px;
+  color: #374151;
+  white-space: normal;
+}
+
+.milestone-table { width: 100%; border-collapse: collapse; }
+.milestone-table th { text-align: left; padding: 10px 12px; background: transparent; color: #6b3e1f; font-weight: 800; }
+.milestone-table td { padding: 10px 12px; border-bottom: 1px solid #f1f2f4; vertical-align: top; }
+
+.milestone-percent-badge {
+  display: inline-block;
+  padding: 8px 10px;
+  background: rgba(146,64,14,0.08);
+  color: #92400e;
+  font-weight: 800;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 54px;
+}
+
+@media (max-width: 700px) {
+  .modal { padding: 14px; }
+  .detail-table th { width: 140px; }
+  .milestone-table th, .milestone-table td { padding: 8px 10px; }
+}
+
+/* Freeze table header - without changing existing table format */
+
+.project-table-wrapper,
+.table-wrapper,
+.performance-table-wrapper,
+.division-table-wrapper {
+  position: relative;
+}
+
+.executive-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }

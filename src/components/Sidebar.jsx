@@ -25,10 +25,10 @@ function Sidebar() {
 
         <p className="menu-title">MAIN MENU</p>
 
-        <NavLink to="dashboard" end>
+        {/* <NavLink to="dashboard" end>
           <FiHome />
           Dashboard 1
-        </NavLink>
+        </NavLink> */}
 
         
         {/* <NavLink to="/dashboard">
@@ -47,7 +47,7 @@ function Sidebar() {
 
         <NavLink to="/mDDashboard">
           <FiFileText />
-          Dashboard 3
+          Dashboard 
         </NavLink>
         {/* <NavLink to="/dashboard/chat">
           <FiFileText />
