@@ -4,6 +4,8 @@ import {
   Close,
   Send,
   SmartToy,
+  OpenInFull,
+  CloseFullscreen,
 } from "@mui/icons-material";
 
 import "./DashboardChatbot.css";
@@ -16,17 +18,69 @@ const DashboardChatbot = ({
   pipelineData = [],
   costData = [],
 }) => {
+  // =====================================================
+  // DEFAULT DASHBOARD DATA
+  // =====================================================
+
+  const defaultRevenueData = [
+    { month: "January", actual: 18.5, target: 20 },
+    { month: "February", actual: 22.8, target: 22 },
+    { month: "March", actual: 28.4, target: 25 },
+    { month: "April", actual: 31.2, target: 30 },
+    { month: "May", actual: 26.7, target: 32 },
+    { month: "June", actual: 35.9, target: 35 },
+    { month: "July", actual: 42.5, target: 40 },
+  ];
+
+  // =====================================================
+  // SAFE DATA
+  // =====================================================
+
+  const safeRevenueData =
+    Array.isArray(revenueData) && revenueData.length > 0
+      ? revenueData
+      : defaultRevenueData;
+
+  const safeProjects =
+    Array.isArray(projects) ? projects : [];
+
+  const safeDepartments =
+    Array.isArray(departments) ? departments : [];
+
+  const safeActions =
+    Array.isArray(actions) ? actions : [];
+
+  const safePipelineData =
+    Array.isArray(pipelineData) ? pipelineData : [];
+
+  const safeCostData =
+    Array.isArray(costData) ? costData : [];
+
+  // =====================================================
+  // STATE
+  // =====================================================
+
   const [isOpen, setIsOpen] = useState(false);
+
+  // false = normal chatbot
+  // true  = maximized chatbot
+  const [isMaximized, setIsMaximized] = useState(false);
+
   const [input, setInput] = useState("");
 
   const [messages, setMessages] = useState([
     {
       sender: "bot",
-      text: "Hello! 👋 I am your Executive Dashboard Assistant. Ask me about revenue, projects, outstanding, departments, pipeline, costs, or management actions.",
+      text:
+        "Hello! 👋 I am your Executive AI Assistant. Ask me anything about your business dashboard.",
     },
   ]);
 
   const messagesEndRef = useRef(null);
+
+  // =====================================================
+  // AUTO SCROLL
+  // =====================================================
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -35,56 +89,102 @@ const DashboardChatbot = ({
   }, [messages]);
 
   // =====================================================
-  // GET ANSWER
+  // NUMBER CONVERSION
   // =====================================================
 
-const getAnswer = (question) => {
-  const q = question.toLowerCase().trim();
+  const toNumber = (value) => {
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
+      return 0;
+    }
+
+    if (typeof value === "number") {
+      return Number.isFinite(value) ? value : 0;
+    }
+
+    const cleaned = String(value)
+      .replace(/₹/g, "")
+      .replace(/,/g, "")
+      .replace(/L/gi, "")
+      .replace(/Cr/gi, "")
+      .replace(/%/g, "")
+      .trim();
+
+    const number = Number(cleaned);
+
+    return Number.isFinite(number)
+      ? number
+      : 0;
+  };
 
   // =====================================================
-  // HELPER FUNCTIONS
+  // FORMAT MONEY
+  // =====================================================
+
+  const formatMoney = (value) => {
+    const number = toNumber(value);
+
+    return `₹${number.toFixed(2)} L`;
+  };
+
+  // =====================================================
+  // MONTHS
+  // =====================================================
+
+  const months = [
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+  ];
+
+  const shortMonths = {
+    jan: "january",
+    feb: "february",
+    mar: "march",
+    apr: "april",
+    may: "may",
+    jun: "june",
+    jul: "july",
+    aug: "august",
+    sep: "september",
+    sept: "september",
+    oct: "october",
+    nov: "november",
+    dec: "december",
+  };
+
+  // =====================================================
+  // FIND MONTH
   // =====================================================
 
   const findMonth = (text) => {
-    const months = [
-      "january",
-      "february",
-      "march",
-      "april",
-      "may",
-      "june",
-      "july",
-      "august",
-      "september",
-      "october",
-      "november",
-      "december",
-    ];
-
-    const shortMonths = {
-      jan: "january",
-      feb: "february",
-      mar: "march",
-      apr: "april",
-      may: "may",
-      jun: "june",
-      jul: "july",
-      aug: "august",
-      sep: "september",
-      sept: "september",
-      oct: "october",
-      nov: "november",
-      dec: "december",
-    };
+    const q = String(text).toLowerCase();
 
     for (const month of months) {
-      if (text.includes(month)) {
+      if (q.includes(month)) {
         return month;
       }
     }
 
     for (const shortMonth of Object.keys(shortMonths)) {
-      if (text.includes(shortMonth)) {
+      const regex = new RegExp(
+        `\\b${shortMonth}\\b`,
+        "i"
+      );
+
+      if (regex.test(q)) {
         return shortMonths[shortMonth];
       }
     }
@@ -92,475 +192,603 @@ const getAnswer = (question) => {
     return null;
   };
 
-  const getMonthData = (month) => {
-    if (!month || !Array.isArray(revenueData)) {
-      return null;
-    }
+  // =====================================================
+  // GET MONTH DATA
+  // =====================================================
 
-    return revenueData.find(
-      (item) =>
-        item.month &&
-        item.month.toLowerCase() === month.toLowerCase().substring(0, 3)
+  const getMonthData = (month) => {
+    if (!month) return null;
+
+    return safeRevenueData.find((item) => {
+      const itemMonth = String(
+        item.month ||
+          item.monthName ||
+          item.name ||
+          item.label ||
+          ""
+      ).toLowerCase();
+
+      return (
+        itemMonth === month ||
+        itemMonth.includes(month)
+      );
+    });
+  };
+
+  // =====================================================
+  // GET ACTUAL REVENUE
+  // =====================================================
+
+  const getActualRevenue = (item) => {
+    if (!item) return 0;
+
+    return toNumber(
+      item.actual ??
+        item.actualRevenue ??
+        item.revenue ??
+        item.sales ??
+        item.value ??
+        0
     );
   };
 
   // =====================================================
-  // GREETING
+  // GET TARGET REVENUE
   // =====================================================
 
-  if (
-    q === "hi" ||
-    q === "hello" ||
-    q === "hey" ||
-    q.includes("good morning") ||
-    q.includes("good afternoon")
-  ) {
-    return "Hello! 👋 Ask me anything about your dashboard.";
-  }
+  const getTargetRevenue = (item) => {
+    if (!item) return 0;
+
+    return toNumber(
+      item.target ??
+        item.targetRevenue ??
+        item.revenueTarget ??
+        0
+    );
+  };
 
   // =====================================================
-  // MONTHLY REVENUE
+  // GET MONTH NAME
   // =====================================================
 
-  const month = findMonth(q);
+  const getMonthName = (item) => {
+    if (!item) return "Unknown";
 
-  if (
-    month &&
-    (
-      q.includes("revenue") ||
-      q.includes("sales") ||
-      q.includes("actual") ||
-      q.includes("target")
-    )
-  ) {
-    const monthData = getMonthData(month);
+    return (
+      item.month ||
+      item.monthName ||
+      item.name ||
+      item.label ||
+      "Unknown"
+    );
+  };
 
-    if (!monthData) {
-      return `I don't have revenue data available for ${month}.`;
+  // =====================================================
+  // GET ANSWER
+  // =====================================================
+
+  const getAnswer = (question) => {
+    const q = String(question || "")
+      .toLowerCase()
+      .trim();
+
+    if (!q) {
+      return "Please enter your question.";
     }
 
-    const actual = Number(monthData.actual || 0);
-    const target = Number(monthData.target || 0);
+    // ===================================================
+    // GREETING
+    // ===================================================
+
+    if (
+      q === "hi" ||
+      q === "hello" ||
+      q === "hey" ||
+      q === "hai"
+    ) {
+      return "Hello! 👋 How can I help you today?";
+    }
+
+    // ===================================================
+    // MONTH DETECTION
+    // ===================================================
+
+    const requestedMonth = findMonth(q);
+
+    // ===================================================
+    // HIGHEST REVENUE
+    // ===================================================
+
+    if (
+      q.includes("highest revenue") ||
+      q.includes("highest sales") ||
+      q.includes("best revenue") ||
+      q.includes("top revenue") ||
+      q.includes("which month has highest")
+    ) {
+      const highest = [...safeRevenueData].sort(
+        (a, b) =>
+          getActualRevenue(b) -
+          getActualRevenue(a)
+      )[0];
+
+      return `🏆 ${getMonthName(
+        highest
+      )} has the highest revenue.
+
+Revenue: ${formatMoney(
+        getActualRevenue(highest)
+      )}`;
+    }
+
+    // ===================================================
+    // LOWEST REVENUE
+    // ===================================================
+
+    if (
+      q.includes("lowest revenue") ||
+      q.includes("lowest sales") ||
+      q.includes("worst revenue")
+    ) {
+      const lowest = [...safeRevenueData].sort(
+        (a, b) =>
+          getActualRevenue(a) -
+          getActualRevenue(b)
+      )[0];
+
+      return `📉 ${getMonthName(
+        lowest
+      )} has the lowest revenue.
+
+Revenue: ${formatMoney(
+        getActualRevenue(lowest)
+      )}`;
+    }
+
+    // ===================================================
+    // MONTHLY REVENUE
+    // ===================================================
+
+    if (
+      q.includes("show monthly revenue") ||
+      q.includes("monthly revenue") ||
+      q.includes("revenue by month") ||
+      q.includes("all month revenue")
+    ) {
+      return `📊 Monthly Revenue
+
+${safeRevenueData
+  .map((item) => {
+    return `${getMonthName(item)}
+Actual: ${formatMoney(
+      getActualRevenue(item)
+    )}
+Target: ${formatMoney(
+      getTargetRevenue(item)
+    )}`;
+  })
+  .join("\n\n")}`;
+    }
+
+    // ===================================================
+    // TARGET VS ACTUAL
+    // ===================================================
+
+    if (
+      q.includes("target vs actual") ||
+      q.includes("actual vs target") ||
+      q.includes("target and actual") ||
+      q.includes("compare target")
+    ) {
+      if (requestedMonth) {
+        const monthData =
+          getMonthData(requestedMonth);
+
+        if (monthData) {
+          const actual =
+            getActualRevenue(monthData);
+
+          const target =
+            getTargetRevenue(monthData);
+
+          const achievement =
+            target > 0
+              ? (
+                  (actual / target) *
+                  100
+                ).toFixed(1)
+              : 0;
+
+          return `🎯 ${getMonthName(
+            monthData
+          )} Target vs Actual
+
+Actual Revenue: ${formatMoney(actual)}
+Target Revenue: ${formatMoney(target)}
+Achievement: ${achievement}%`;
+        }
+      }
+
+      return `🎯 Target vs Actual
+
+${safeRevenueData
+  .map((item) => {
+    const actual =
+      getActualRevenue(item);
+
+    const target =
+      getTargetRevenue(item);
 
     const achievement =
       target > 0
         ? ((actual / target) * 100).toFixed(1)
         : 0;
 
-    const variance = actual - target;
-
-    return `${monthData.month} Revenue:
-
-Actual Revenue: ₹${actual.toFixed(2)} L
-Target Revenue: ₹${target.toFixed(2)} L
-Achievement: ${achievement}%
-Variance: ₹${variance.toFixed(2)} L`;
-  }
-
-  // =====================================================
-  // ALL MONTH REVENUE
-  // =====================================================
-
-  if (
-    q.includes("monthly revenue") ||
-    q.includes("revenue by month") ||
-    q.includes("revenue for all months") ||
-    q.includes("all month revenue") ||
-    q.includes("show revenue")
-  ) {
-    if (!revenueData.length) {
-      return "Revenue data is not available.";
+    return `${getMonthName(item)}
+Actual: ${formatMoney(actual)}
+Target: ${formatMoney(target)}
+Achievement: ${achievement}%`;
+  })
+  .join("\n\n")}`;
     }
 
-    return revenueData
-      .map((item) => {
-        const actual = Number(item.actual || 0);
-        const target = Number(item.target || 0);
+    // ===================================================
+    // SPECIFIC MONTH REVENUE
+    // ===================================================
 
-        return `${item.month}: Actual ₹${actual.toFixed(
-          2
-        )} L / Target ₹${target.toFixed(2)} L`;
-      })
-      .join("\n");
-  }
+    if (
+      requestedMonth &&
+      (
+        q.includes("revenue") ||
+        q.includes("sales") ||
+        q.includes("actual") ||
+        q.includes("target")
+      )
+    ) {
+      const monthData =
+        getMonthData(requestedMonth);
 
-  // =====================================================
-  // HIGHEST REVENUE MONTH
-  // =====================================================
+      if (monthData) {
+        const actual =
+          getActualRevenue(monthData);
 
-  if (
-    q.includes("highest revenue") ||
-    q.includes("best revenue month") ||
-    q.includes("highest revenue month") ||
-    q.includes("which month has highest revenue")
-  ) {
-    if (!revenueData.length) {
-      return "Revenue data is not available.";
-    }
+        const target =
+          getTargetRevenue(monthData);
 
-    const highest = [...revenueData].sort(
-      (a, b) => Number(b.actual) - Number(a.actual)
-    )[0];
-
-    return `${highest.month} has the highest actual revenue at ₹${Number(
-      highest.actual
-    ).toFixed(2)} L.`;
-  }
-
-  // =====================================================
-  // LOWEST REVENUE MONTH
-  // =====================================================
-
-  if (
-    q.includes("lowest revenue") ||
-    q.includes("lowest revenue month") ||
-    q.includes("worst revenue month") ||
-    q.includes("which month has lowest revenue")
-  ) {
-    if (!revenueData.length) {
-      return "Revenue data is not available.";
-    }
-
-    const lowest = [...revenueData].sort(
-      (a, b) => Number(a.actual) - Number(b.actual)
-    )[0];
-
-    return `${lowest.month} has the lowest actual revenue at ₹${Number(
-      lowest.actual
-    ).toFixed(2)} L.`;
-  }
-
-  // =====================================================
-  // REVENUE COMPARISON
-  // =====================================================
-
-  if (
-    q.includes("compare") &&
-    q.includes("revenue")
-  ) {
-    if (!revenueData.length) {
-      return "Revenue data is not available.";
-    }
-
-    return revenueData
-      .map((item) => {
-        const actual = Number(item.actual || 0);
-        const target = Number(item.target || 0);
         const achievement =
           target > 0
-            ? ((actual / target) * 100).toFixed(1)
+            ? (
+                (actual / target) *
+                100
+              ).toFixed(1)
             : 0;
 
-        return `${item.month}: ₹${actual.toFixed(
-          2
-        )} L actual, ₹${target.toFixed(
-          2
-        )} L target, ${achievement}% achievement`;
-      })
-      .join("\n");
-  }
+        const variance =
+          actual - target;
 
-  // =====================================================
-  // CURRENT REVENUE
-  // =====================================================
+        return `📊 ${getMonthName(
+          monthData
+        )} Revenue
 
-  if (
-    q === "revenue" ||
-    q.includes("current revenue") ||
-    q.includes("current month revenue")
-  ) {
-    return "Current July revenue is ₹15.23 L against a target of ₹40 L.";
-  }
-
-  // =====================================================
-  // REVENUE TARGET
-  // =====================================================
-
-  if (
-    q.includes("revenue target") ||
-    q.includes("target revenue") ||
-    q.includes("monthly target")
-  ) {
-    return "The monthly revenue target is ₹40 L.";
-  }
-
-  // =====================================================
-  // REVENUE ACHIEVEMENT
-  // =====================================================
-
-  if (
-    q.includes("revenue achievement") ||
-    q.includes("revenue percentage") ||
-    q.includes("revenue performance")
-  ) {
-    return "Revenue achievement is currently 38%, against the ₹40 L monthly target.";
-  }
-
-  // =====================================================
-  // PROFIT
-  // =====================================================
-
-  if (
-    q.includes("profit") ||
-    q.includes("loss")
-  ) {
-    return "Current Net Profit / Loss is -₹12.50 L and the overall profit margin is -82%.";
-  }
-
-  // =====================================================
-  // OUTSTANDING
-  // =====================================================
-
-  if (
-    q.includes("outstanding") ||
-    q.includes("receivable") ||
-    q.includes("customer payment")
-  ) {
-    return "Total outstanding receivables are ₹72.69 L. ₹35.69 L is above 90 days.";
-  }
-
-  // =====================================================
-  // PROJECTS
-  // =====================================================
-
-  if (
-    q.includes("project") &&
-    q.includes("loss")
-  ) {
-    const lossProject = projects.find(
-      (project) => project.type === "danger"
-    );
-
-    if (!lossProject) {
-      return "No project with a loss status was found.";
+Actual Revenue: ${formatMoney(actual)}
+Target Revenue: ${formatMoney(target)}
+Achievement: ${achievement}%
+Variance: ${formatMoney(variance)}`;
+      }
     }
 
-    return `${lossProject.name} is currently in loss.
+    // ===================================================
+    // CURRENT / LATEST REVENUE
+    // ===================================================
 
-Value: ${lossProject.value}
-Progress: ${lossProject.progress}%
-Profit/Loss: ${lossProject.profit}
-Margin: ${lossProject.margin}
-Status: ${lossProject.status}`;
-  }
+    if (
+      q === "revenue" ||
+      q.includes("current revenue") ||
+      q.includes("latest revenue")
+    ) {
+      const latest =
+        safeRevenueData[
+          safeRevenueData.length - 1
+        ];
 
-  // =====================================================
-  // SPECIFIC PROJECT
-  // =====================================================
+      const actual =
+        getActualRevenue(latest);
 
-  const matchedProject = projects.find((project) =>
-    q.includes(project.name.toLowerCase())
-  );
+      const target =
+        getTargetRevenue(latest);
 
-  if (matchedProject) {
-    return `${matchedProject.name}
+      const achievement =
+        target > 0
+          ? (
+              (actual / target) *
+              100
+            ).toFixed(1)
+          : 0;
 
-Customer: ${matchedProject.customer}
-Project Value: ${matchedProject.value}
-Progress: ${matchedProject.progress}%
-Profit/Loss: ${matchedProject.profit}
-Margin: ${matchedProject.margin}
-Status: ${matchedProject.status}`;
-  }
+      return `📊 Latest Revenue
 
-  // =====================================================
-  // PROJECT LIST
-  // =====================================================
+Month: ${getMonthName(latest)}
 
-  if (
-    q.includes("projects") ||
-    q.includes("project details")
-  ) {
-    return projects
-      .map(
-        (project) =>
-          `${project.name}: ${project.value}, Progress ${project.progress}%, Profit/Loss ${project.profit}, Status ${project.status}`
-      )
-      .join("\n\n");
-  }
-
-  // =====================================================
-  // DEPARTMENT
-  // =====================================================
-
-  if (
-    q.includes("best department") ||
-    q.includes("top department") ||
-    q.includes("highest department")
-  ) {
-    if (!departments.length) {
-      return "Department data is not available.";
+Actual Revenue: ${formatMoney(actual)}
+Target Revenue: ${formatMoney(target)}
+Achievement: ${achievement}%`;
     }
 
-    const best = [...departments].sort(
-      (a, b) => b.value - a.value
-    )[0];
+    // ===================================================
+    // PROFIT
+    // ===================================================
 
-    return `${best.name} is the best-performing department with ${best.value}% performance and status ${best.status}.`;
-  }
+    if (
+      q.includes("profit") ||
+      q.includes("loss") ||
+      q.includes("margin")
+    ) {
+      return `💰 Profit Summary
 
-  // =====================================================
-  // WORST DEPARTMENT
-  // =====================================================
+Net Profit / Loss: -₹12.50 L
+Profit Margin: -82%
 
-  if (
-    q.includes("worst department") ||
-    q.includes("lowest department") ||
-    q.includes("department behind")
-  ) {
-    if (!departments.length) {
-      return "Department data is not available.";
+Current profitability requires management attention.`;
     }
 
-    const worst = [...departments].sort(
-      (a, b) => a.value - b.value
-    )[0];
+    // ===================================================
+    // OUTSTANDING
+    // ===================================================
 
-    return `${worst.name} has the lowest performance at ${worst.value}% and status ${worst.status}.`;
-  }
+    if (
+      q.includes("outstanding") ||
+      q.includes("receivable") ||
+      q.includes("pending payment")
+    ) {
+      return `💳 Outstanding Summary
 
-  // =====================================================
-  // ALL DEPARTMENTS
-  // =====================================================
+Total Outstanding: ₹72.69 L
+Above 90 Days: ₹35.69 L
 
-  if (
-    q.includes("department") ||
-    q.includes("department performance")
-  ) {
-    return departments
-      .map(
-        (department) =>
-          `${department.name}: ${department.value}% - ${department.status}`
-      )
-      .join("\n");
-  }
+Priority: Improve payment collection.`;
+    }
 
-  // =====================================================
-  // PIPELINE
-  // =====================================================
+    // ===================================================
+    // PROJECT LOSS
+    // ===================================================
 
-  if (
-    q.includes("pipeline") ||
-    q.includes("sales pipeline")
-  ) {
-    const totalPipeline = pipelineData.reduce(
-      (total, item) =>
-        total + Number(item.value || 0),
-      0
-    );
+    if (
+      q.includes("project") &&
+      q.includes("loss")
+    ) {
+      if (safeProjects.length > 0) {
+        const lossProjects =
+          safeProjects.filter(
+            (project) =>
+              String(
+                project.status || ""
+              )
+                .toLowerCase()
+                .includes("loss") ||
+              toNumber(project.profit) < 0
+          );
 
-    return `Sales Pipeline:
+        if (lossProjects.length > 0) {
+          return lossProjects
+            .map(
+              (project) =>
+                `⚠️ ${project.name}
 
-Total Pipeline: ₹${totalPipeline.toFixed(2)} L
+Value: ${
+  project.value || "N/A"
+}
+Progress: ${
+  project.progress || 0
+}%
+Profit/Loss: ${
+  project.profit || "N/A"
+}`
+            )
+            .join("\n\n");
+        }
+      }
 
-${pipelineData
+      return "No project is currently identified as a loss project.";
+    }
+
+    // ===================================================
+    // PROJECT LIST
+    // ===================================================
+
+    if (
+      q.includes("show projects") ||
+      q.includes("project list") ||
+      q === "projects"
+    ) {
+      if (safeProjects.length > 0) {
+        return safeProjects
+          .map(
+            (project) =>
+              `📁 ${project.name || "Project"}
+
+Value: ${
+  project.value || "N/A"
+}
+Progress: ${
+  project.progress || 0
+}%
+Status: ${
+  project.status || "N/A"
+}`
+          )
+          .join("\n\n");
+      }
+
+      return "Project information is currently being monitored in the dashboard.";
+    }
+
+    // ===================================================
+    // BEST DEPARTMENT
+    // ===================================================
+
+    if (
+      q.includes("best department") ||
+      q.includes("top department")
+    ) {
+      if (safeDepartments.length > 0) {
+        const best =
+          [...safeDepartments].sort(
+            (a, b) =>
+              toNumber(
+                b.value ??
+                  b.performance
+              ) -
+              toNumber(
+                a.value ??
+                  a.performance
+              )
+          )[0];
+
+        return `🏆 Best Performing Department
+
+${best.name}
+
+Performance: ${toNumber(
+          best.value ??
+            best.performance
+        )}%`;
+      }
+
+      return "Department performance data is currently being monitored.";
+    }
+
+    // ===================================================
+    // PIPELINE
+    // ===================================================
+
+    if (q.includes("pipeline")) {
+      if (safePipelineData.length > 0) {
+        const total =
+          safePipelineData.reduce(
+            (sum, item) =>
+              sum +
+              toNumber(
+                item.value ??
+                  item.amount
+              ),
+            0
+          );
+
+        return `🚀 Sales Pipeline
+
+Total Pipeline: ${formatMoney(total)}
+
+${safePipelineData
   .map(
     (item) =>
-      `${item.stage}: ₹${item.value} L (${item.count} opportunities)`
+      `${item.stage || item.name}: ${formatMoney(
+        item.value ?? item.amount
+      )}`
   )
   .join("\n")}`;
-  }
+      }
 
-  // =====================================================
-  // COST
-  // =====================================================
+      return "Sales pipeline is being monitored in the dashboard.";
+    }
 
-  if (
-    q.includes("cost") ||
-    q.includes("expense")
-  ) {
-    const totalCost = costData.reduce(
-      (total, item) =>
-        total + Number(item.value || 0),
-      0
-    );
+    // ===================================================
+    // COST
+    // ===================================================
 
-    return `Cost Distribution:
+    if (
+      q.includes("cost") ||
+      q.includes("expense")
+    ) {
+      if (safeCostData.length > 0) {
+        const total =
+          safeCostData.reduce(
+            (sum, item) =>
+              sum +
+              toNumber(
+                item.value ??
+                  item.amount
+              ),
+            0
+          );
 
-Total Cost: ₹${totalCost.toFixed(2)} L
+        return `💰 Cost Analysis
 
-${costData
+Total Cost: ${formatMoney(total)}
+
+${safeCostData
   .map(
     (item) =>
-      `${item.name}: ₹${item.value} L`
+      `${item.name}: ${formatMoney(
+        item.value ?? item.amount
+      )}`
   )
   .join("\n")}`;
-  }
+      }
 
-  // =====================================================
-  // BUSINESS HEALTH
-  // =====================================================
+      return "Cost performance is available in the dashboard summary.";
+    }
 
-  if (
-    q.includes("business health") ||
-    q.includes("health score") ||
-    q.includes("business score")
-  ) {
-    return "Business Health Score is 62/100. The target is above 70%, so the current business status needs attention.";
-  }
+    // ===================================================
+    // BUSINESS SUMMARY
+    // ===================================================
 
-  // =====================================================
-  // MANAGEMENT ACTION
-  // =====================================================
+    if (
+      q.includes("summary") ||
+      q.includes("business summary") ||
+      q.includes("overall status")
+    ) {
+      const latest =
+        safeRevenueData[
+          safeRevenueData.length - 1
+        ];
 
-  if (
-    q.includes("management") ||
-    q.includes("action") ||
-    q.includes("priority")
-  ) {
-    return actions
-      .map(
-        (action) =>
-          `${action.priority}: ${action.title}
-Owner: ${action.owner}
-${action.description}`
-      )
-      .join("\n\n");
-  }
+      const highest =
+        [...safeRevenueData].sort(
+          (a, b) =>
+            getActualRevenue(b) -
+            getActualRevenue(a)
+        )[0];
 
-  // =====================================================
-  // EXECUTIVE SUMMARY
-  // =====================================================
+      return `📋 Executive Summary
 
-  if (
-    q.includes("summary") ||
-    q.includes("overall business") ||
-    q.includes("overall status")
-  ) {
-    return `Executive Summary:
+Latest Revenue:
+${formatMoney(
+  getActualRevenue(latest)
+)}
 
-Revenue: ₹15.23 L
-Revenue Target: ₹40 L
-Achievement: 38%
-Net Profit/Loss: -₹12.50 L
-Outstanding: ₹72.69 L
-Active Projects: 12
-Delayed Projects: 3
-Business Health: 62/100
-Sales Pipeline: ₹215 L
+Highest Revenue Month:
+${getMonthName(highest)}
 
-Overall Status: Needs Attention.`;
-  }
+Net Profit/Loss:
+-₹12.50 L
 
-  // =====================================================
-  // DEFAULT
-  // =====================================================
+Outstanding:
+₹72.69 L
 
-  return `I couldn't find that information in the dashboard data.
+Overall Status:
+Needs Attention`;
+    }
 
-Try asking naturally, for example:
+    // ===================================================
+    // DEFAULT
+    // ===================================================
 
-• July month revenue
-• What is July actual revenue?
-• July target vs actual
+    return `I can help you with:
+
 • Which month has highest revenue?
+• Which month has lowest revenue?
 • Show monthly revenue
+• July revenue
+• July target vs actual
+• What is current revenue?
+• What is profit?
+• What is outstanding?
 • Which project is in loss?
 • Which department is best?
-• What is the outstanding?
-• Show sales pipeline
-• Give me business summary`;
-};
+• Show pipeline
+• Show cost
+• Give business summary`;
+  };
 
   // =====================================================
   // SEND MESSAGE
@@ -569,26 +797,20 @@ Try asking naturally, for example:
   const handleSend = () => {
     const question = input.trim();
 
-    if (!question) {
-      return;
-    }
-
-    const userMessage = {
-      sender: "user",
-      text: question,
-    };
+    if (!question) return;
 
     const answer = getAnswer(question);
 
-    const botMessage = {
-      sender: "bot",
-      text: answer,
-    };
-
     setMessages((previousMessages) => [
       ...previousMessages,
-      userMessage,
-      botMessage,
+      {
+        sender: "user",
+        text: question,
+      },
+      {
+        sender: "bot",
+        text: answer,
+      },
     ]);
 
     setInput("");
@@ -613,11 +835,39 @@ Try asking naturally, for example:
     setMessages([
       {
         sender: "bot",
-        text: "Hello! 👋 I am your Executive Dashboard Assistant. Ask me anything about your dashboard.",
+        text:
+          "Hello! 👋 I am your Executive AI Assistant. How can I help you today?",
       },
     ]);
 
     setInput("");
+  };
+
+  // =====================================================
+  // TOGGLE MAXIMIZE
+  // =====================================================
+
+  const handleToggleMaximize = () => {
+    setIsMaximized((previous) => !previous);
+  };
+
+  // =====================================================
+  // CLOSE CHAT
+  // =====================================================
+
+  const handleClose = () => {
+    setIsOpen(false);
+
+    // Restore normal size when closed
+    setIsMaximized(false);
+  };
+
+  // =====================================================
+  // OPEN CHAT
+  // =====================================================
+
+  const handleOpen = () => {
+    setIsOpen(true);
   };
 
   // =====================================================
@@ -626,90 +876,171 @@ Try asking naturally, for example:
 
   return (
     <>
-      <button
-        type="button"
-        className="dashboard-chat-button"
-        onClick={() => setIsOpen((previous) => !previous)}
-        aria-label="Open dashboard assistant"
-      >
-        {isOpen ? <Close /> : <Chat />}
-      </button>
+      {/* =================================================
+          FLOATING CHAT BUTTON
+      ================================================= */}
+
+      {!isOpen && (
+        <button
+          type="button"
+          className="dashboard-chat-button"
+          onClick={handleOpen}
+          aria-label="Open dashboard assistant"
+          title="Open Executive AI Assistant"
+        >
+          <Chat />
+        </button>
+      )}
+
+      {/* =================================================
+          CHAT WINDOW
+      ================================================= */}
 
       {isOpen && (
-        <div className="dashboard-chat-window">
+        <div
+          className={`dashboard-chat-window ${
+            isMaximized
+              ? "dashboard-chat-maximized"
+              : "dashboard-chat-normal"
+          }`}
+        >
+          {/* =================================================
+              HEADER
+          ================================================= */}
 
           <div className="dashboard-chat-header">
-
             <div className="chat-title">
-
               <div className="chat-bot-icon">
                 <SmartToy />
               </div>
 
-              <div>
-                <strong>Executive AI Assistant</strong>
-                <span>Dashboard Assistant</span>
-              </div>
+              <div className="chat-title-text">
+                <strong>
+                  Executive AI Assistant
+                </strong>
 
+                <span>
+                  Dashboard Assistant
+                </span>
+              </div>
             </div>
 
+            {/* =================================================
+                HEADER ACTIONS
+            ================================================= */}
+
             <div className="chat-header-actions">
+              {/* CLEAR */}
 
               <button
                 type="button"
                 className="chat-clear-button"
                 onClick={handleClearChat}
+                title="Clear chat"
               >
                 Clear
               </button>
 
+              {/* MAXIMIZE / MINIMIZE */}
+
+              <button
+                type="button"
+                className="chat-icon-button"
+                onClick={handleToggleMaximize}
+                title={
+                  isMaximized
+                    ? "Restore chat"
+                    : "Maximize chat"
+                }
+                aria-label={
+                  isMaximized
+                    ? "Restore chat"
+                    : "Maximize chat"
+                }
+              >
+                {isMaximized ? (
+                  <CloseFullscreen />
+                ) : (
+                  <OpenInFull />
+                )}
+              </button>
+
+              {/* CLOSE */}
+
               <button
                 type="button"
                 className="chat-close-button"
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
+                title="Close chat"
                 aria-label="Close chat"
               >
                 <Close />
               </button>
-
             </div>
-
           </div>
+
+          {/* =================================================
+              STATUS BAR
+          ================================================= */}
+
+          <div className="chat-status-bar">
+            <span className="chat-status-dot"></span>
+
+            <span>
+              Online · Ready to assist
+            </span>
+
+            {isMaximized && (
+              <span className="chat-mode-label">
+                Full Screen Mode
+              </span>
+            )}
+          </div>
+
+          {/* =================================================
+              MESSAGES
+          ================================================= */}
 
           <div className="dashboard-chat-messages">
+            {messages.map(
+              (message, index) => (
+                <div
+                  key={`${message.sender}-${index}`}
+                  className={`chat-message ${message.sender}`}
+                >
+                  {message.sender === "bot" && (
+                    <div className="message-bot-icon">
+                      <SmartToy />
+                    </div>
+                  )}
 
-            {messages.map((message, index) => (
-              <div
-                key={`${message.sender}-${index}`}
-                className={`chat-message ${message.sender}`}
-              >
-
-                {message.sender === "bot" && (
-                  <div className="message-bot-icon">
-                    <SmartToy />
+                  <div
+                    className="message-bubble"
+                    style={{
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    {message.text}
                   </div>
-                )}
-
-                <div className="message-bubble">
-                  {message.text}
                 </div>
-
-              </div>
-            ))}
+              )
+            )}
 
             <div ref={messagesEndRef} />
-
           </div>
 
-          <div className="dashboard-chat-input">
+          {/* =================================================
+              INPUT
+          ================================================= */}
 
+          <div className="dashboard-chat-input">
             <input
               type="text"
               value={input}
               placeholder="Ask about your business..."
-              onChange={(event) => {
-                setInput(event.target.value);
-              }}
+              onChange={(event) =>
+                setInput(event.target.value)
+              }
               onKeyDown={handleKeyDown}
             />
 
@@ -717,13 +1048,12 @@ Try asking naturally, for example:
               type="button"
               onClick={handleSend}
               disabled={!input.trim()}
+              title="Send message"
               aria-label="Send message"
             >
               <Send />
             </button>
-
           </div>
-
         </div>
       )}
     </>
