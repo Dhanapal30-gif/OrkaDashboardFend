@@ -97,6 +97,21 @@ const costData = [
 ];
 
 /* =====================================================
+   OH & GST COST (Month wise)
+===================================================== */
+
+const ohGstData = [
+  { month: "January-26",  salary: 351904, rent: 46934, eb: 0,        loanInterest: 38624, otherExpenses: 76594,  atmWithdrawal: 35000, total: 549056, paidGST: 180,    salesGST: 550453, diff: 329188 },
+  { month: "February-26", salary: 366780, rent: 46934, eb: 3929,     loanInterest: 55205, otherExpenses: 123596, atmWithdrawal: 35000, total: 631444, paidGST: 221265, salesGST: 179064, diff: 57826 },
+  { month: "March-26",    salary: 338989, rent: 80924, eb: 43611,    loanInterest: 65005, otherExpenses: 175977, atmWithdrawal: 10000, total: 714506, paidGST: 121238, salesGST: 49074,  diff: 22368 },
+  { month: "April-26",    salary: 352562, rent: 46934, eb: 16453,    loanInterest: 33625, otherExpenses: 37169,  atmWithdrawal: 50000, total: 536743, paidGST: 26706,  salesGST: 179595, diff: 110120 },
+  { month: "May-26",      salary: 366043, rent: 46934, eb: 12937,    loanInterest: 42428, otherExpenses: 34593,  atmWithdrawal: 20000, total: 509998, paidGST: 69475,  salesGST: 274233, diff: 59042 },
+  { month: "June-26",     salary: 373322, rent: 46934, eb: 17424,    loanInterest: 36916, otherExpenses: 55442,  atmWithdrawal: 30000, total: 560038, paidGST: 215191, salesGST: 181341, diff: 180589 },
+  { month: "July-26",     salary: 355746, rent: 9500,  eb: 0,        loanInterest: 46288, otherExpenses: 56303,  atmWithdrawal: 70000, total: 537837, paidGST: 752,    salesGST: 555591, diff: 388264 },
+  { month: "August-26",   salary: 357596, rent: 45232, eb: 21619.08, loanInterest: 46172, otherExpenses: 49718,  atmWithdrawal: 10000, total: 530337, paidGST: 167327, salesGST: null,   diff: 0 },
+];
+
+/* =====================================================
    PROJECT PROFITABILITY
 ===================================================== */
 const projects = [
@@ -886,7 +901,7 @@ const MDDashboard = () => {
         <div className="hero-content">
           <div className="hero-badge">
             <Bolt />
-            EXECUTIVE OVERVIEW
+            Orka OverAll Performance
           </div>
           {/* <h1>MD / CEO Executive Dashboard</h1> */}
           <p>Real-time business performance, financial health and management priorities</p>
@@ -1375,45 +1390,106 @@ const MDDashboard = () => {
             </thead>
 
             <tbody>
-              {outstandingAmountData.map((item) => (
-                <tr key={item.prn}>
-                  <td data-label="PRN No">
-                    <strong>{item.prn}</strong>
-                  </td>
-                  <td data-label="Name">
-                    <div className="table-icon-cell">
-                      <div className={`project-avatar ${item.type}`}>
-                        <BusinessCenter />
-                      </div>
-                      <span>{item.name}</span>
-                    </div>
-                  </td>
-                  <td data-label="Invoice No">{item.invoice}</td>
-                  <td data-label="Total Value">₹{item.value.toLocaleString("en-IN")}</td>
-                </tr>
-              ))}
+  <tr className="table-total-row table-total-row-top">
+    <td colSpan={3}>
+      <strong>TOTAL</strong>
+    </td>
+    <td data-label="Total Value">
+      <strong>₹{outstandingAmountTotal.toLocaleString("en-IN")}</strong>
+    </td>
+  </tr>
 
-              <tr className="table-total-row">
-                <td colSpan={3}>
-                  <strong>TOTAL</strong>
-                </td>
-                <td data-label="Total Value">
-                  <strong>₹{outstandingAmountTotal.toLocaleString("en-IN")}</strong>
-                </td>
-              </tr>
-            </tbody>
+  {outstandingAmountData.map((item) => (
+    <tr key={item.prn}>
+      <td data-label="PRN No">
+        <strong>{item.prn}</strong>
+      </td>
+      <td data-label="Name">
+        <div className="table-icon-cell">
+          <div className={`project-avatar ${item.type}`}>
+            <BusinessCenter />
+          </div>
+          <span>{item.name}</span>
+        </div>
+      </td>
+      <td data-label="Invoice No">{item.invoice}</td>
+      <td data-label="Total Value">₹{item.value.toLocaleString("en-IN")}</td>
+    </tr>
+  ))}
+</tbody>
           </table>
         </div>
       </div>
 
+{/* OH & GST COST */}
+<div className="premium-card section-card">
+  <div className="card-header">
+    <div>
+      <span className="card-label">OVERHEAD & TAX TRACKING</span>
+      <h3>OH & GST Cost</h3>
+      <p>Month-wise overhead expenses, GST paid/collected and total cost</p>
+    </div>
+  </div>
 
+  <ResponsiveContainer width="100%" height={320}>
+    <BarChart data={ohGstData}>
+      <CartesianGrid stroke="#edf0f5" strokeDasharray="4 4" vertical={false} />
+      <XAxis dataKey="month" axisLine={false} tickLine={false} interval={0} angle={-20} textAnchor="end" height={60} />
+      <YAxis axisLine={false} tickLine={false} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+      <Tooltip formatter={(v) => `₹${v.toLocaleString("en-IN")}`} />
+      <Bar dataKey="total" fill="#6366f1" radius={[10, 10, 0, 0]} name="Total" />
+    </BarChart>
+  </ResponsiveContainer>
+
+  <div className="table-wrapper compact-table" style={{ marginTop: 16 }}>
+    <table className="executive-table stack-table">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Salary</th>
+          <th>Rent</th>
+          <th>EB</th>
+          <th>Loan Interest</th>
+          <th>Other Expenses</th>
+          <th>ATM Withdrawal</th>
+          <th>Total</th>
+          <th>Paid GST</th>
+          <th>Sales GST</th>
+          <th>Diff</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {ohGstData.map((item) => (
+          <tr key={item.month}>
+            <td data-label="Month"><strong>{item.month}</strong></td>
+            <td data-label="Salary">₹{item.salary.toLocaleString("en-IN")}</td>
+            <td data-label="Rent">₹{item.rent.toLocaleString("en-IN")}</td>
+            <td data-label="EB">₹{item.eb.toLocaleString("en-IN")}</td>
+            <td data-label="Loan Interest">₹{item.loanInterest.toLocaleString("en-IN")}</td>
+            <td data-label="Other Expenses">₹{item.otherExpenses.toLocaleString("en-IN")}</td>
+            <td data-label="ATM Withdrawal">₹{item.atmWithdrawal.toLocaleString("en-IN")}</td>
+            <td data-label="Total"><strong>₹{item.total.toLocaleString("en-IN")}</strong></td>
+            <td data-label="Paid GST">₹{item.paidGST.toLocaleString("en-IN")}</td>
+            <td data-label="Sales GST">{item.salesGST != null ? `₹${item.salesGST.toLocaleString("en-IN")}` : "—"}</td>
+            <td data-label="Diff">
+              <strong className={item.diff >= 0 ? "profit-positive" : "profit-negative"}>
+                ₹{item.diff.toLocaleString("en-IN")}
+              </strong>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
       {/* ORKA DIVISIONS SUMMARY (hide yellow columns) */}
       <div className="premium-card section-card">
         <div className="card-header">
           <div>
             <span className="card-label">ORKA TECHNOLOGIES</span>
             <h3>Business Divisions (summary)</h3>
-            <p>Showing main columns. Click the view icon to see management focus, priority and notes.</p>
+            {/* <p>Showing main columns. Click the view icon to see management focus, priority and notes.</p> */}
           </div>
         </div>
 
@@ -1575,7 +1651,7 @@ const MDDashboard = () => {
       </div> */}
 
       {/* MONTH WISE PROJECT EXPENSE */}
-      <div className="premium-card section-card">
+      {/* <div className="premium-card section-card">
         <div className="card-header">
           <div>
             <span className="card-label">PROJECT COST CONTROL</span>
@@ -1620,7 +1696,7 @@ const MDDashboard = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
 
       {/* MONTH WISE PERFORMANCE */}
       <div className="premium-card section-card">

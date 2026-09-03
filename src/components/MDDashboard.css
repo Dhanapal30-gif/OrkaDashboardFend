@@ -609,6 +609,12 @@
   border-bottom: 1px solid #f1f5f9;
 }
 
+.table-total-row-top {
+  position: sticky;
+  top: 42px; /* sits right below the sticky table header */
+  z-index: 9;
+}
+
 .executive-table tbody tr:hover { background: #fafbff; }
 
 .executive-table td strong { font-size: var(--fs-xs); }
@@ -1224,6 +1230,10 @@
   justify-content: center;
   z-index: 2000;
   padding: 20px;
+}
+.division-table-wrapper.compact-table {
+  max-height: none;
+  overflow-y: visible;
 }
 
 .modal {
